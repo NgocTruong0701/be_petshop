@@ -1,0 +1,6 @@
+### Vavariables
+@url_dev = http://localhost:3000/v1/api
+
+### signup
+
+POST {{url_dev}}/signup

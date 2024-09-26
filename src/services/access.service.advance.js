@@ -2,12 +2,12 @@
 import User from '../models/user.model.js';
 import bcrypt from 'bcrypt';
 import { USER_ROLES } from '../constants/index.js';
-import crypto from 'node:crypto';
+import crypto from 'crypto';
 import KeyTokenService from './keyToken.service.js';
 import { createTokenPair } from '../auth/authUtils.js';
 import { getInfoData } from '../utils/index.js';
 
-class AccessService {
+class AccessServiceAdvance {
     static async signUp({ name, email, password, roles = [USER_ROLES.USER], status = 'active' }) {
         try {
             const existingUser = await User.findOne({ email }).lean();
@@ -28,23 +28,32 @@ class AccessService {
                 };
             }
 
-            const privateKey = crypto.randomBytes(64).toString('hex');
-            const publicKey = crypto.randomBytes(64).toString('hex');
-
-            const keyStore = await KeyTokenService.createKeyToken({
-                userId: newUser._id,
-                publicKey,
-                privateKey,
+            const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
+                modulusLength: 4096,
+                publicKeyEncoding: {
+                    type: 'pkcs1',
+                    format: 'pem',
+                },
+                privateKeyEncoding: {
+                    type: 'pkcs1',
+                    format: 'pem',
+                }
             });
 
-            if (!keyStore) {
+            const publicKeyString = await KeyTokenService.createKeyToken({
+                userId: newUser._id,
+                publicKey,
+            });
+
+            if (!publicKeyString) {
                 return {
                     code: '400',
-                    message: 'keyStore error!!!',
+                    message: 'Invalid public key!!!',
                 };
             }
 
-            const tokens = await createTokenPair({ userId: newUser._id, email }, keyStore.publicKey, keyStore.privateKey);
+            const publicKeyObject = crypto.createPublicKey(publicKeyString);
+            const tokens = await createTokenPair({ userId: newUser._id, email }, publicKeyObject, privateKey);
             console.log('Create token pair success!!!:: ', tokens);
 
             return {
@@ -64,4 +73,4 @@ class AccessService {
     }
 }
 
-export default AccessService;
+export default AccessServiceAdvance;

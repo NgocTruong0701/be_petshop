@@ -13,7 +13,9 @@ const app = express();
 app.use(morgan('dev')); // log thông tin request 
 // app.use(morgan('combined'));
 app.use(helmet()); // ẩn 1 số thông tin máy chủ khi response 
-app.use(compression()); // downsize data response 
+app.use(compression()); // downsize data response
+app.use(express.json()); // parse data json
+app.use(express.urlencoded({ extended: true })); // parse data urlencoded
 
 // init db
 instanceMongoDb;

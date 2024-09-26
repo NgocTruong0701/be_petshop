@@ -15,12 +15,16 @@ const keyTokenSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    privateKey: {
+        type: String,
+        required: true,
+    },
     refreshTokens: {
         type: Array,
         default: []
     }
 }, {
-    collation: COLLECTION_NAME,
+    collection: COLLECTION_NAME,
     timestamps: true
 });
 

@@ -5,6 +5,7 @@
 
 POST {{url_dev}}/signup
 Content-Type: application/json
+x-api-key: 411e4926062d5547baa6ef5e521031e855ec2ac1d0715379a66da45cad32ea8bbd644b923d1b2bbbbe50bc0c4680b0adaf823f323af65f1ea628e7e45295eeaa
 
 {
     "name": "Nguyen Van A",

@@ -6,6 +6,7 @@ import instanceMongoDb from './dbs/init.mongodb.js';
 import { checkOverLoad } from './helpers/check.connection.js';
 import router from '../src/routers/index.js';
 import 'dotenv/config';
+import { errorHandler, notFoundHandler } from './middlewares/errorHandlers.js';
 
 const app = express();
 
@@ -26,20 +27,9 @@ app.use('', router);
 
 
 // handling error
-app.use((res, req, next) => {
-    const error = new Error('Not Found');
-    error.status = 404;
-    next(error);
-}); // middleware will be called when route not found
+app.use(notFoundHandler); // middleware will be called when route not found
 
-app.use((error, req, res, next) => {
-    const statusCode = error.status || 500;
-    return res.status(statusCode).json({
-        status: 'error',
-        code: statusCode,
-        message: error.message || 'Internal Server Error',
-    });
-}); // middleware will be called when error, must have 4 params (error, req, res, next) to distinguish from regular middleware
+app.use(errorHandler); // middleware will be called when error, must have 4 params (error, req, res, next) to distinguish from regular middleware
 
 
 export default app;

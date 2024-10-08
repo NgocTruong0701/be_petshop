@@ -2,10 +2,11 @@
 
 import express from 'express';
 import accessController from '../../controllers/access.controller.js';
+import asyncHandler from '../../utils/asyncHandler.js';
 
 const router = express.Router();
 
 // SignUp
-router.post('/signup', accessController.signUp);
+router.post('/signup', asyncHandler(accessController.signUp));
 
 export default router;

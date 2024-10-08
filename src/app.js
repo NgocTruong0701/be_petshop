@@ -22,9 +22,24 @@ instanceMongoDb;
 // checkOverLoad();
 
 // init routers
-app.use('', router)
+app.use('', router);
 
 
 // handling error
+app.use((res, req, next) => {
+    const error = new Error('Not Found');
+    error.status = 404;
+    next(error);
+}); // middleware will be called when route not found
+
+app.use((error, req, res, next) => {
+    const statusCode = error.status || 500;
+    return res.status(statusCode).json({
+        status: 'error',
+        code: statusCode,
+        message: error.message || 'Internal Server Error',
+    });
+}); // middleware will be called when error, must have 4 params (error, req, res, next) to distinguish from regular middleware
+
 
 export default app;

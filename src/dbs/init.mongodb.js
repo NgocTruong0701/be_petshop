@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import { countConnect } from "../helpers/check.connection.js";
 import config from "../configs/config.mongodb.js";
 
-const connectString = `mongodb://${config.db.host}:${config.db.port}/${config.db.name}`;
+const connectString = process.env.MONGODB_URI || `mongodb://${config.db.host}:${config.db.port}/${config.db.name}`;
 const isDev = process.env.ENV === 'dev';
 
 class Database {

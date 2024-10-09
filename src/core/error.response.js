@@ -1,9 +1,9 @@
-import { HTTP_STATUS_CODE, HTTP_STATUS_CODE_MESSAGE } from '../constants/http.response';
+import { HTTP_STATUS_CODE, HTTP_STATUS_CODE_MESSAGE } from '../constants/http.response.js';
 
 class ErrorResponse extends Error {
     constructor(message, statusCode) {
         super(message);
-        this.statusCode = statusCode;
+        this.status = statusCode;
     }
 }
 

@@ -8,5 +8,7 @@ const router = express.Router();
 
 // SignUp
 router.post('/signup', asyncHandler(accessController.signUp));
+// Login
+router.post('/login', asyncHandler(accessController.login));
 
 export default router;

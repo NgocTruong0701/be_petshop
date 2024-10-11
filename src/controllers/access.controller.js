@@ -1,6 +1,6 @@
 'use strict'
 
-import { CREATED } from '../core/sucess.response.js';
+import { CREATED, OK } from '../core/sucess.response.js';
 import AccessService from '../services/access.service.js';
 
 class AccessController {
@@ -10,6 +10,13 @@ class AccessController {
         new CREATED({
             message: "Regiserted OK!",
             metadata: result,
+        }).send(res);
+    }
+
+    login = async (req, res, next) => {
+        new OK({
+            message: "Login Successfully!",
+            metadata: await AccessService.login(req.body)
         }).send(res);
     }
 }

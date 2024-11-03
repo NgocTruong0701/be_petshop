@@ -4,9 +4,9 @@ import bcrypt from 'bcrypt';
 import { USER_ROLES } from '../constants/index.js';
 import crypto, { generateKey } from 'node:crypto';
 import KeyTokenService from './keyToken.service.js';
-import { createTokenPair } from '../auth/authUtils.js';
+import { createTokenPair, verifyToken } from '../auth/authUtils.js';
 import { getInfoData } from '../utils/index.js';
-import { BadRequestError, InternalServerError, UnauthorizedError } from '../core/error.response.js';
+import { BadRequestError, ForbiddenError, InternalServerError, UnauthorizedError } from '../core/error.response.js';
 import UserService from './user.service.js';
 
 class AccessService {
@@ -14,7 +14,7 @@ class AccessService {
         const privateKey = crypto.randomBytes(64).toString('hex');
         const publicKey = crypto.randomBytes(64).toString('hex');
 
-        const tokens = await createTokenPair({ userId: userId, email }, publicKey, privateKey);
+        const tokens = await createTokenPair({ userId, email }, publicKey, privateKey);
         console.log('Create token pair success!!!:: ', tokens);
 
         const keyStore = await KeyTokenService.createKeyToken({
@@ -77,7 +77,27 @@ class AccessService {
         };
     }
 
-    
+    static async logout(keyStore) {
+        const delKey = await KeyTokenService.removeKeyById(keyStore._id);
+        return delKey;
+    }
+
+    static async handlerRefreshToken(refreshToken) {
+        const foundToken = await KeyTokenService.findByRefreshTokenUsed(refreshToken);
+
+        if (foundToken) {
+            const { userId, email } = await verifyToken(refreshToken, foundToken.privateKey);
+            console.log({ userId, email });
+
+            await KeyTokenService.removeKeyByUserId(userId);
+            throw ForbiddenError('Something wrong happend!!! Please relogin');
+        }
+
+        const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
+        if (!holderToken) {
+            throw UnauthorizedError('Token not found');
+        }
+    }
 }
 
 export default AccessService;
